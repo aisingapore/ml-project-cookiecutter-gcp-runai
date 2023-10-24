@@ -29,24 +29,19 @@ follow through with the guide:
           through [Rancher Desktop](https://rancherdesktop.io).
     - __[miniconda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html):__
       for Python virtual environment management.
-    - __[`kubectl`](https://kubernetes.io/docs/tasks/tools/):__
-      CLI for Kubernetes.
-    - __[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html):__ CLI for AWS services, but we will specifically be using it
-      for interacting with the AI Singapore's Elastic Cloud Storage
-      (ECS) service through the S3 protocol.
-        - You may choose to just use
-          [`boto3`](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html),
-          the Python SDK for AWS instead, to interact with the ECS
-          service within a Python environment. However, this does
-          not fall under the scope of this guide.
+    - __[`gcloud` CLI](https://cloud.google.com/sdk/docs/install):__
+      Google Cloud CLI for accessing Google Cloud services. Additional
+      [components](https://cloud.google.com/sdk/docs/components#listing_components)
+      can be installed through `gcloud` for interaction with various
+      Google Cloud services.
+    - __[`kubectl`](https://kubernetes.io/docs/tasks/tools):__
+      CLI for interacting with Kubernetes clusters. This can be
+      installed on its own or
+      [as a component of the `gcloud` CLI](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl#install_kubectl).
     - *(Optional)* __[`helm`](https://helm.sh/docs/intro/install/):__
       CLI for Kubernetes' package manager.
 - Access to a project on AI Singapore's Run:ai cluster.
   See [here](./03-mlops-components-platform.md#runai) for more information.
-- Credentials for AI Singapore's Elastic Cloud Storage (ECS) service.
-  See [here](./03-mlops-components-platform.md#elastic-cloud-storage-ecs) for more information.
-- Credentials for AI Singapore's Harbor registry.
-  See [here](./03-mlops-components-platform.md#harbor) for more information.
 - Credentials for an MLflow Tracking server.
   See [here](./03-mlops-components-platform.md#mlflow) for more information.
 
@@ -86,22 +81,22 @@ follow through with the guide:
 
 ## Tips and Tricks
 
-- If you're using Rancher Desktop, you might encounter issues with 
+- If you're using Rancher Desktop, you might encounter issues with
   regards to the lack of CPU and memory.
-    - For Mac/Linux users, from the main window, click on the gear 
-      button on the top right.  
-      Then, proceed to the Virtual Machines section and increase your 
+    - For macOS/Linux users, from the main window, click on the gear
+      button on the top right.
+      Then, proceed to the `Virtual Machines` section and increase your
       CPU and memory resources directly.
-    - For Windows users, create a `.wslconfig` file user `%UserProfile%` 
+    - For Windows users, create a `.wslconfig` file user `%UserProfile%`
       with the following content:
       ```toml
       [wsl2]
       memory=8GB
       ```
-      Change the amount of memory to something you're comfortable with 
-      giving up to build Docker images.
-- For Windows users, if you have both Rancher and Docker Desktop 
+      Change the amount of memory you would like to dedicate for
+      building images and running containers.
+- For Windows users, if you have both Rancher and Docker Desktop
   installed, you may need to disable the networking tunnel:
-    - From the gear button on the top right, go to the WSL section 
-      under the Network tab. From there, uncheck the `Enable networking 
+    - From the gear button on the top right, go to the WSL section
+      under the Network tab. From there, uncheck the `Enable networking
       tunnel`.
