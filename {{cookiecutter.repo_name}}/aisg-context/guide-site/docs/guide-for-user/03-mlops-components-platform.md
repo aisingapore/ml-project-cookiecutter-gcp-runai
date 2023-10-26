@@ -14,12 +14,25 @@ Your credentials for your NUS Staff/Student account is needed to
 login to NUS' VPN for access to the following:
 
 - [AI Singapore's GitLab instance](#gitlab)
-- [AI Singapore's Kubernetes clusters](#kubernetes)
-- [AI Singapore's Run:ai platform](#runai)
-- [AI Singapore's Harbor registry](#harbor)
-- [AI Singapore's Elastic Cloud Storage (ECS)](#elastic-cloud-storage-ecs)
-- [Your project's on-premise MLflow Tracking server](#mlflow)
 - Other miscellaneous NUS resources
+
+## Authorisation for Google Cloud
+
+You are to use `gcloud` to interact with various Google Cloud services.
+Before you are able to do so, you would need to authorise the CLI
+using a user account or a service account. Most of the time, it would be
+the latter.
+
+```bash
+# For authorisation with user account
+$ gcloud auth login
+# For authorisation with service account
+$ gcloud auth login --cred-file=/path/to/service-account-key.json
+```
+
+??? info "Reference Link(s)"
+
+    - [Google Cloud Cloud SDK Docs - Authorize the gcloud CLI](https://cloud.google.com/sdk/docs/authorizing)
 
 ## Kubernetes
 
@@ -502,171 +515,59 @@ verification code and paste it into the terminal.
     and `refresh-token` fields, which are then used by the `kubectl`
     CLI tool to communicate with the Run:ai cluster.
 
-## Harbor
+## Google Artifact Registry
 
-AI Singapore uses a self-hosted Harbor as the on-premise container image
-registry.
+While AI Singapore has a self-hosted Harbor as the on-premise container
+image registry, projects with access to Google Cloud projects may simply
+resort to
+[Artifact Registry](https://cloud.google.com/artifact-registry) for
+storing of container images, among other things.
 
-> https://registry.aisingapore.net
-
-![AI Singapore's Harbor Registry - Login Page](assets/screenshots/harbor-login-page.png)
-
-To login, use your Azure account username without the domain
-(if your username is `user@aisingapore.org`, your username in this
-context will just be `user`) and the same password as your Azure
-account.
-
-On a successful login, you should be able to see a list of Harbor
-projects that you have access to.
-
-![AI Singapore's Harbor Registry - Projects Page](assets/screenshots/harbor-projects-page.png)
-
-### Docker CLI Authentication
-
-While Harbor has its own front-end interface, one may use the Docker CLI
-to interact with the registry.
+To push or pull images to/from Artifact Registry, you would need to
+authenticate with the Google Cloud project that the registry is
+associated with. You can do so by running the following command:
 
 ```bash
-$ docker login registry.aisingapore.net
-Username: <YOUR_USERNAME_HERE>
-Password:
-Login Succeeded!
+$ gcloud auth configure-docker asia-southeast1-docker.pkg.dev
 ```
 
-Upon a successful login through the Docker CLI, you can push or pull
-images to/from the Harbor registry.
-
-### Harbor Projects, Membership & Roles
-
-For you to push any image to Harbor, you would need authorised access
-to projects i.e. membership in a project. Projects can be public or
-private. From the docs:
-
-> *There are two types of project in Harbor:*
->
-> - *Public: Any user can pull images from this project. This is a*
-> *convenient way for you to share repositories with others.*
-> - *Private: Only users who are members of the project can pull images.*
-
-Hence, do ensure that you have rightful access to your project team's
-Harbor project in order for you to push any relevant images that you
-have built. Do contact the MLOps team (`mlops@aisingapore.org`) for
-access matters.
-
-!!! note
-    On your first ever login to Harbor, you would not have any
-    membership access to any projects. This is because projects can
-    only add users who have logged into Harbor at least once. Should
-    you want to be added to a project on Harbor, do notify the MLOps
-    team following your first login.
-
-With that said, not all membership is equal i.e. one would need to be
-assigned the membership roles of either `Project Admin`, `Master`, or
-`Developer` for pushing permissions.
-
-For more information on the aforementioned concepts, do refer to the
-reference links below.
+The command above will populate your Docker configuration file with
+the intended Artifact Registry Docker host. Host names Google
+Artifact Registry ends with `-docker.pkg.dev`.
 
 ??? info "Reference Link(s)"
 
-    - [Harbor Docs - Working with Projects](https://goharbor.io/docs/1.10/working-with-projects)
-    - [Harbor Docs - User Permissions By Role](https://goharbor.io/docs/2.0.0/administration/managing-users/user-permissions-by-role)
+    - [Google Cloud Artifact Registry Docs - Set up authentication for Docker](https://cloud.google.com/artifact-registry/docs/docker/authentication)
+    - [Google Cloud Artifact Registry Docs - Push and pull images](https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling)
 
-### Robot Accounts
+## Google Cloud Storage (GCS)
 
-Aside from using your own credentials to interact with the registry,
-Harbor project admins can create robot accounts to be used for
-automated workflows. Robot accounts can be provided with customised
-permissions, configurable according to the needs of the workflows
-that will be using such accounts.
+In the context of a Google Cloud infrastructure environment, there are
+two main storage mediums:
 
-Each project team would be provided with the credentials of a default
-robot account (contained in a `.json` file) by the MLOps team.
-
-## Elastic Cloud Storage (ECS)
-
-In the context of AI Singapore's infrastructure, there are two main
-storage mediums:
-
-1. AI Singapore's on-premise Network File Storage (NFS)
-2. AI Singapore's on-premise object storage, Elastic Cloud Storage (ECS)
+1. Google Cloud Filestore for managed network file storage (NFS)
+2. Google Cloud Storage (GCS) for object storage
 
 The usage of NFS storage is mainly observable through Persistent
 Volumes (PVs) or virtual machine disks. There is however little to
-nothing for end-users to configure the usage of NFS storage as most of
-the setup will be done by AI Singapore's Platforms team.
+nothing for end-users to configure the NFS storage as most of the setup
+will be done by AI Singapore's Platforms team.
 
-However, to access ECS, there are a number of things that are required
-of the end-users.
-
-??? info "Reference Link(s)"
-
-    - [Dell Technologies Learning Center - Elastic Cloud Storage](https://www.dell.com/en-sg/dt/learn/data-storage/ecs.htm)
-    - [IBM Blog - Object vs. File vs. Block Storage: What’s the Difference?](https://www.ibm.com/blog/object-vs-file-vs-block-storage)
-
-### AWS CLI for S3 Protocol
-
-AI Singapore's ECS makes use of the S3 protocol and so we can make use
-of the AWS CLI's S3 commands to interact with the storage system.
-Instructions for installing the AWS CLI (v2) can be found
-[here](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
-
-Following installation of the CLI, you would need to configure the
-settings to be used. The settings can be populated within separate
-files: `config` and `credentials`, usually located under `$HOME/.aws`.
-However, we can make do with just populating the `credentials` file.
-An example of a `credentials` file containing credentials for multiple
-profiles would look like the following:
+As for GCS, one would be provided with access to one or more GCS buckets
+through the provided user or service account. Upon authorisation, one
+may list the contents of a bucket like so:
 
 !!! note inline end
-    The `aws_access_key_id` and `aws_secret_access_key` are provided by
-    the DataOps team. The team is reachable at
-    `dataops@aisingapore.org`.
-
-```config
-[profile-1]
-aws_access_key_id = project-1-user
-aws_secret_access_key = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-[profile-2]
-aws_access_key_id = project-2-user
-aws_secret_access_key = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-```
-
-The `profile-1` and `profile-2` are just arbitrary profile names that
-you can set for your own reference.
-
-To list the buckets that a profile as access to, you may run a command
-similar to the following:
+    `GCP_PROJECT_ID` and `GCP_PROJECT_ID` are provided by the MLOps
+    team. The team is reachable at `mlops@aisingapore.org`.
 
 ```bash
-$ aws --profile profile-1 --endpoint-url="https://necs.nus.edu.sg" s3 ls
-YYYY-MM-DD hh:mm:ss bucket-1
-YYYY-MM-DD hh:mm:ss bucket-2
+$ gsutil ls -p <GCP_PROJECT_ID> gs://<GCS_BUCKET_NAME>
 ```
-
-The `--endpoint-url` flag is required for the AWS CLI to know where to
-send the requests to. In this case, we are sending requests to
-AI Singapore's ECS server.
-
-!!! note
-    Some buckets may be hidden when listing buckets. This is due
-    various access permissions that might have been set by
-    administrators. For some buckets, while you may not be able to list
-    them, you may still view the objects that are contained within them.
 
 ??? info "Reference Link(s)"
 
-    - [AWS Docs - AWS CLI Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
-    - [AWS CLI Command Reference - s3](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/index.html)
-
-### ECS Robot/Service Accounts
-
-Project teams may also make use of robot/service accounts to interact
-with ECS. Robot/service accounts are essentially IAM users that are
-created by administrators. These accounts are usually created for
-automated workflows that require access to ECS. Configuring them for the
-CLI works the same as configuring a regular user account.
+    - [IBM Blog - Object vs. File vs. Block Storage: What’s the Difference?](https://www.ibm.com/blog/object-vs-file-vs-block-storage)
 
 ## MLflow
 
@@ -685,7 +586,7 @@ to make use of the MLflow Tracking server:
 
 - MLflow Tracking server URL(s)
 - Your own username and password for the same server(s)
-- _(Optional)_ ECS credentials for artifact storage
+- _(Optional)_ Google Cloud service account key for artifact storage
 
 One would be prompted for a username and password when accessing an
 MLflow Tracking server for the first time:
@@ -718,12 +619,10 @@ MLflow Tracking server.
     ```bash
     $ conda create -n mlflow-test python=3.10.11
     $ conda activate mlflow-test
-    $ pip install boto3==1.28.2 mlflow
+    $ pip install google-cloud-storage mlflow
     $ export MLFLOW_TRACKING_USERNAME=<MLFLOW_TRACKING_USERNAME>
     $ export MLFLOW_TRACKING_PASSWORD=<MLFLOW_TRACKING_PASSWORD>
-    $ export MLFLOW_S3_ENDPOINT_URL="https://necs.nus.edu.sg"
-    $ export AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
-    $ export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
+    $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_GOOGLE_CLOUD_SA_KEY>
     $ python src/mlflow_test.py <MLFLOW_TRACKING_URI> <NAME_OF_DEFAULT_MLFLOW_EXPERIMENT>
     ```
 
@@ -732,12 +631,10 @@ MLflow Tracking server.
     ```powershell
     $ conda create -n mlflow-test python=3.10.11
     $ conda activate mlflow-test
-    $ pip install boto3==1.28.2 mlflow
+    $ pip install google-cloud-storage mlflow
     $ $MLFLOW_TRACKING_USERNAME=<MLFLOW_TRACKING_USERNAME>
     $ $MLFLOW_TRACKING_PASSWORD=<MLFLOW_TRACKING_PASSWORD>
-    $ $MLFLOW_S3_ENDPOINT_URL="https://necs.nus.edu.sg"
-    $ $AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
-    $ $AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
+    $ $GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_GOOGLE_CLOUD_SA_KEY>
     $ python src/mlflow_test.py <MLFLOW_TRACKING_URI> <NAME_OF_DEFAULT_MLFLOW_EXPERIMENT>
     ```
 
