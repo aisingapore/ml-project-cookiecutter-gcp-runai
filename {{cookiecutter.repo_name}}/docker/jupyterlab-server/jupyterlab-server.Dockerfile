@@ -76,6 +76,10 @@ RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/s
     apt-get install -y -qq \
     helm
 
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
+    apt-get update -y && apt-get install google-cloud-cli -y
+
 # Configure environment
 ENV CONDA_HOME=/miniconda3 \
     SHELL=/bin/bash \
@@ -89,7 +93,7 @@ ENV PATH="${CONDA_HOME}/bin:${PATH}" \
     HOME="/home/${NB_USER}"
 
 # Copy a script that we will use to correct permissions after running certain commands
-COPY docker/jupyter/fix-permissions /usr/local/bin/fix-permissions
+COPY docker/jupyterlab-server/fix-permissions /usr/local/bin/fix-permissions
 RUN chmod a+rx /usr/local/bin/fix-permissions
 
 # Enable prompt color in the skeleton .bashrc before creating the default NB_USER
@@ -192,9 +196,9 @@ ENTRYPOINT ["tini", "-g", "--"]
 CMD ["start-notebook.sh"]
 
 # Copy local files as late as possible to avoid cache busting
-COPY docker/jupyter/start.sh docker/jupyter/start-notebook.sh docker/jupyter/start-singleuser.sh /usr/local/bin/
+COPY docker/jupyterlab-server/start.sh docker/jupyterlab-server/start-notebook.sh docker/jupyterlab-server/start-singleuser.sh /usr/local/bin/
 # Currently need to have both jupyter_notebook_config and jupyter_server_config to support classic and lab
-COPY docker/jupyter/jupyter_notebook_config.py /etc/jupyter/
+COPY docker/jupyterlab-server/jupyter_notebook_config.py /etc/jupyter/
 
 # Fix permissions on /etc/jupyter as root
 USER root
