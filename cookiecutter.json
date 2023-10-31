@@ -5,6 +5,6 @@
     "src_package_name": "{{ cookiecutter.repo_name.replace('-', '_') }}",
     "src_package_name_short": "{{ cookiecutter.src_package_name }}",
     "runai_proj_name": "The RunAI namespace used by the project.",
-    "harbor_registry_project_path": "Path of the project's container registry on Harbor.",
+    "image_registry_path": "Path of the project's image registry on Google Cloud Artifact Registry or AI Singapore's Harbor.",
     "author_name": "Your alias or project team's name."
 }
