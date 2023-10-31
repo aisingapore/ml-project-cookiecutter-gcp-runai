@@ -51,7 +51,7 @@ of AI Singapore's infrastructure.
 
 - __Workspace name:__ `<YOUR_HYPHENATED_NAME>-vscode`
 
-- __Environment:__ `aisg-vscode-server-v4-16-1`
+- __Environment:__ `aisg-gcp-vscode-server-v4-16-1`
 
 - __Compute Resource:__ `cpu-mid`
 
@@ -70,7 +70,7 @@ Once the workspace is active (indicated by a green status), you may
 access the workspace by clicking on the `CONNECT` button and choosing
 `VSCode`. This will open up a new browser tab for the VSCode server,
 accessible through a URL that follows the following convention:
-`<NAME_OF_PROJECT>-<NAME_OF_WORKSPACE>.runai.aisingapore.net`.
+`<NAME_OF_PROJECT>-<NAME_OF_WORKSPACE>.<RUNAI_CLUSTER_URI>`.
 However, you cannot access the VSCode interface just yet; you will
 prompted for a password.
 
@@ -198,7 +198,7 @@ included in the image:
 - Miniconda
 - `kubectl`
 - Helm
-- AWS CLI
+- `gcloud` CLI
 
 Often times, project teams would like to further customise the VSCode
 server image to their liking. One can edit the Dockerfile and build the
@@ -208,20 +208,20 @@ custom image:
 
     ```bash
     $ docker build \
-        -t {{cookiecutter.harbor_registry_project_path}}/vscode-server-custom:0.1.0 \
+        -t {{cookiecutter.image_registry_path}}/vscode-server-custom:0.1.0 \
         -f docker/vscode-server/vscode-server.Dockerfile \
         --platform linux/amd64 .
-    $ docker push {{cookiecutter.harbor_registry_project_path}}/vscode-server-custom:0.1.0
+    $ docker push {{cookiecutter.image_registry_path}}/vscode-server-custom:0.1.0
     ```
 
 === "Windows PowerShell"
 
     ```powershell
     $ docker build `
-        -t {{cookiecutter.harbor_registry_project_path}}/vscode-server-custom:0.1.0 `
+        -t {{cookiecutter.image_registry_path}}/vscode-server-custom:0.1.0 `
         -f docker/vscode-server/vscode-server.Dockerfile `
         --platform linux/amd64 .
-    $ docker push {{cookiecutter.harbor_registry_project_path}}/vscode-server-custom:0.1.0
+    $ docker push {{cookiecutter.image_registry_path}}/vscode-server-custom:0.1.0
     ```
 
 ## JupyterLab
@@ -240,7 +240,7 @@ a JupyterLab using the following recommended blocks:
 
 - __Workspace name:__ `<YOUR_HYPHENATED_NAME>-jupyterlab`
 
-- __Environment:__ `aisg-jupyterlab-server-0-1-0`
+- __Environment:__ `aisg-gcp-jupyterlab-server`
 
 - __Compute Resource:__ `cpu-mid`
 
@@ -266,7 +266,7 @@ Once the workspace is active (indicated by a green status), you may
 access the workspace by clicking on the `CONNECT` button and choosing
 `Jupyter`. This will open up a new browser tab for the VSCode server,
 accessible through a URL that follows the following convention:
-`<NAME_OF_PROJECT>-<NAME_OF_WORKSPACE>.runai.aisingapore.net`.
+`<NAME_OF_PROJECT>-<NAME_OF_WORKSPACE>.<RUNAI_CLUSTER_URI>`.
 However, you cannot access the JupyterLab interface just yet; you will
 prompted for a token.
 
@@ -321,20 +321,20 @@ server as well as any associated files can be found under
 
     ```bash
     $ docker build \
-        -t {{cookiecutter.harbor_registry_project_path}}/jupyterlab-server-custom:0.1.0 \
+        -t {{cookiecutter.image_registry_path}}/jupyterlab-server-custom:0.1.0 \
         -f docker/jupyterlab-server/jupyterlab-server.Dockerfile \
         --platform linux/amd64 .
-    $ docker push {{cookiecutter.harbor_registry_project_path}}/jupyterlab-server-custom:0.1.0
+    $ docker push {{cookiecutter.image_registry_path}}/jupyterlab-server-custom:0.1.0
     ```
 
 === "Windows PowerShell"
 
     ```powershell
     $ docker build `
-        -t {{cookiecutter.harbor_registry_project_path}}/jupyterlab-server-custom:0.1.0 `
+        -t {{cookiecutter.image_registry_path}}/jupyterlab-server-custom:0.1.0 `
         -f docker/jupyterlab-server/jupyterlab-server.Dockerfile `
         --platform linux/amd64 .
-    $ docker push {{cookiecutter.harbor_registry_project_path}}/jupyterlab-server-custom:0.1.0
+    $ docker push {{cookiecutter.image_registry_path}}/jupyterlab-server-custom:0.1.0
     ```
 
 ## Using Docker within Kubernetes
