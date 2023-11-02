@@ -44,7 +44,7 @@ specific MLflow experiment within your VSCode server:
     $ export MLFLOW_TRACKING_URI=<MLFLOW_TRACKING_URI>
     $ export MLFLOW_TRACKING_USERNAME=<MLFLOW_TRACKING_USERNAME>
     $ export MLFLOW_TRACKING_PASSWORD=<MLFLOW_TRACKING_PASSWORD>
-    $  python -c "import mlflow; mlflow_experiment = mlflow.get_experiment_by_name('<NAME_OF_DEFAULT_MLFLOW_EXPERIMENT>'); print(mlflow_experiment.artifact_location)"
+    $  python -c "import mlflow; mlflow_experiment = mlflow.get_experiment_by_name('<NAME_OF_MLFLOW_EXPERIMENT>'); print(mlflow_experiment.artifact_location)"
     s3://<BUCKET_NAME>/subdir/paths
     ```
 
@@ -54,7 +54,7 @@ specific MLflow experiment within your VSCode server:
     $ $Env:MLFLOW_TRACKING_URI=<MLFLOW_TRACKING_URI>
     $ $Env:MLFLOW_TRACKING_USERNAME=<MLFLOW_TRACKING_USERNAME>
     $ $Env:MLFLOW_TRACKING_PASSWORD=<MLFLOW_TRACKING_PASSWORD>
-    $  python -c "import mlflow; mlflow_experiment = mlflow.get_experiment_by_name('<NAME_OF_DEFAULT_MLFLOW_EXPERIMENT>'); print(mlflow_experiment.artifact_location)"
+    $  python -c "import mlflow; mlflow_experiment = mlflow.get_experiment_by_name('<NAME_OF_MLFLOW_EXPERIMENT>'); print(mlflow_experiment.artifact_location)"
     s3://<BUCKET_NAME>/subdir/paths
     ```
 

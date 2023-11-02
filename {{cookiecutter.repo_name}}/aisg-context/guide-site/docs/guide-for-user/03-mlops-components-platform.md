@@ -623,7 +623,7 @@ MLflow Tracking server.
     $ export MLFLOW_TRACKING_USERNAME=<MLFLOW_TRACKING_USERNAME>
     $ export MLFLOW_TRACKING_PASSWORD=<MLFLOW_TRACKING_PASSWORD>
     $ export GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_GOOGLE_CLOUD_SA_KEY>
-    $ python src/mlflow_test.py <MLFLOW_TRACKING_URI> <NAME_OF_DEFAULT_MLFLOW_EXPERIMENT>
+    $ python src/mlflow_test.py <MLFLOW_TRACKING_URI> <NAME_OF_MLFLOW_EXPERIMENT>
     ```
 
 === "Windows PowerShell"
@@ -635,7 +635,7 @@ MLflow Tracking server.
     $ $MLFLOW_TRACKING_USERNAME=<MLFLOW_TRACKING_USERNAME>
     $ $MLFLOW_TRACKING_PASSWORD=<MLFLOW_TRACKING_PASSWORD>
     $ $GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_GOOGLE_CLOUD_SA_KEY>
-    $ python src/mlflow_test.py <MLFLOW_TRACKING_URI> <NAME_OF_DEFAULT_MLFLOW_EXPERIMENT>
+    $ python src/mlflow_test.py <MLFLOW_TRACKING_URI> <NAME_OF_MLFLOW_EXPERIMENT>
     ```
 
 A successful run of the script would present you with an experiment
