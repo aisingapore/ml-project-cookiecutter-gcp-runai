@@ -47,20 +47,20 @@ provided in this template:
 
     ```bash
     $ docker build \
-        -t {{cookiecutter.harbor_registry_project_path}}/data-prep:0.1.0 \
+        -t {{cookiecutter.image_registry_path}}/data-prep:0.1.0 \
         -f docker/{{cookiecutter.repo_name}}-data-prep.Dockerfile \
         --platform linux/amd64 .
-    $ docker push {{cookiecutter.harbor_registry_project_path}}/data-prep:0.1.0
+    $ docker push {{cookiecutter.image_registry_path}}/data-prep:0.1.0
     ```
 
 === "Windows PowerShell"
 
     ```powershell
     $ docker build `
-        -t {{cookiecutter.harbor_registry_project_path}}/data-prep:0.1.0 `
+        -t {{cookiecutter.image_registry_path}}/data-prep:0.1.0 `
         -f docker/{{cookiecutter.repo_name}}-data-prep.Dockerfile `
         --platform linux/amd64 .
-    $ docker push {{cookiecutter.harbor_registry_project_path}}/data-prep:0.1.0
+    $ docker push {{cookiecutter.image_registry_path}}/data-prep:0.1.0
     ```
 
 Now that we have the Docker image pushed to the registry, we can submit
@@ -71,7 +71,7 @@ a job using that image to Run:ai\:
     ```bash
     $ runai submit \
         --job-name-prefix <YOUR_HYPHENATED_NAME>-data-prep \
-        -i {{cookiecutter.harbor_registry_project_path}}/data-prep:0.1.0 \
+        -i {{cookiecutter.image_registry_path}}/data-prep:0.1.0 \
         --working-dir /<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}} \
         --pvc <NAME_OF_DATA_SOURCE>:/<NAME_OF_DATA_SOURCE> \
         --cpu 2 \
@@ -84,7 +84,7 @@ a job using that image to Run:ai\:
     ```powershell
     $ runai submit `
         --job-name-prefix <YOUR_HYPHENATED_NAME>-data-prep `
-        -i {{cookiecutter.harbor_registry_project_path}}/data-prep:0.1.0 `
+        -i {{cookiecutter.image_registry_path}}/data-prep:0.1.0 `
         --working-dir /<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}} `
         --pvc <NAME_OF_DATA_SOURCE>:/<NAME_OF_DATA_SOURCE> `
         --cpu 2 `
@@ -118,16 +118,12 @@ for a run to a remote MLflow Tracking server.
 An MLflow Tracking server is usually set up within the Run:ai project's
 namespace for projects that requires model experimentation.
 Artifacts logged through the MLflow API can be
-uploaded to ECS buckets, assuming the client is authorised for access to
-ECS.
+uploaded to GCS buckets, assuming the server is authorised for access to
+GCS.
 
 !!! note
     The username and password for the MLflow Tracking server
     can be retrieved from the MLOps team or your team lead.
-
-To log and upload artifacts to ECS buckets through MLflow, you need to
-ensure that the client has access to the credentials of an account that
-can write to a bucket.
 
 __Reference(s):__
 
@@ -143,20 +139,20 @@ we need to build the Docker image to be used for it:
 
     ```bash
     $ docker build \
-        -t {{cookiecutter.harbor_registry_project_path}}/model-training:0.1.0 \
+        -t {{cookiecutter.image_registry_path}}/model-training:0.1.0 \
         -f docker/{{cookiecutter.repo_name}}-model-training.Dockerfile \
         --platform linux/amd64 .
-    $ docker push {{cookiecutter.harbor_registry_project_path}}/model-training:0.1.0
+    $ docker push {{cookiecutter.image_registry_path}}/model-training:0.1.0
     ```
 
 === "Windows PowerShell"
 
     ```powershell
     $ docker build `
-        -t {{cookiecutter.harbor_registry_project_path}}/model-training:0.1.0 `
+        -t {{cookiecutter.image_registry_path}}/model-training:0.1.0 `
         -f docker/{{cookiecutter.repo_name}}-model-training.Dockerfile `
         --platform linux/amd64 .
-    $ docker push {{cookiecutter.harbor_registry_project_path}}/model-training:0.1.0
+    $ docker push {{cookiecutter.image_registry_path}}/model-training:0.1.0
     ```
 
 Now that we have the Docker image pushed to the registry,
@@ -167,17 +163,14 @@ we can run a job using it:
     ```bash
     $ runai submit \
         --job-name-prefix <YOUR_HYPHENATED_NAME>-train \
-        -i {{cookiecutter.harbor_registry_project_path}}/model-training:0.1.0 \
+        -i {{cookiecutter.image_registry_path}}/model-training:0.1.0 \
         --working-dir /home/aisg/{{cookiecutter.repo_name}} \
         --pvc <NAME_OF_DATA_SOURCE>:/<NAME_OF_DATA_SOURCE> \
         --cpu 2 \
         --memory 4G \
-        -e AWS_ACCESS_KEY_ID=SECRET:s3-credentials,accessKeyId \
-        -e AWS_SECRET_ACCESS_KEY=SECRET:s3-credentials,secretAccessKey \
-        -e MLFLOW_S3_ENDPOINT_URL="https://necs.nus.edu.sg" \
         -e MLFLOW_TRACKING_USERNAME=<YOUR_MLFLOW_USERNAME> \
         -e MLFLOW_TRACKING_PASSWORD=<YOUR_MLFLOW_PASSWORD> \
-        --command -- '/bin/bash -c "source activate {{cookiecutter.repo_name}} && python src/train_model.py train_model.data_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/data/processed/mnist-pngs-data-aisg-processed train_model.setup_mlflow=true train_model.mlflow_tracking_uri=<MLFLOW_TRACKING_URI> train_model.mlflow_exp_name=<NAME_OF_DEFAULT_MLFLOW_EXPERIMENT> train_model.model_checkpoint_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}}/models train_model.epochs=3"'
+        --command -- '/bin/bash -c "source activate {{cookiecutter.repo_name}} && python src/train_model.py train_model.data_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/data/processed/mnist-pngs-data-aisg-processed train_model.setup_mlflow=true train_model.mlflow_tracking_uri=<MLFLOW_TRACKING_URI> train_model.mlflow_exp_name=<NAME_OF_MLFLOW_EXPERIMENT> train_model.model_checkpoint_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}}/models train_model.epochs=3"'
     ```
 
 === "Windows PowerShell"
@@ -185,23 +178,20 @@ we can run a job using it:
     ```powershell
     $ runai submit `
         --job-name-prefix <YOUR_HYPHENATED_NAME>-train `
-        -i {{cookiecutter.harbor_registry_project_path}}/model-training:0.1.0 `
+        -i {{cookiecutter.image_registry_path}}/model-training:0.1.0 `
         --working-dir /home/aisg/{{cookiecutter.repo_name}} `
         --pvc <NAME_OF_DATA_SOURCE>:/<NAME_OF_DATA_SOURCE> `
         --cpu 2 `
         --memory 4G `
-        -e AWS_ACCESS_KEY_ID=SECRET:s3-credentials,accessKeyId `
-        -e AWS_SECRET_ACCESS_KEY=SECRET:s3-credentials,secretAccessKey `
-        -e MLFLOW_S3_ENDPOINT_URL="https://necs.nus.edu.sg" `
         -e MLFLOW_TRACKING_USERNAME=<YOUR_MLFLOW_USERNAME> `
         -e MLFLOW_TRACKING_PASSWORD=<YOUR_MLFLOW_PASSWORD> `
-        --command -- "/bin/bash -c 'source activate {{cookiecutter.repo_name}} && python src/train_model.py train_model.data_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/data/processed/mnist-pngs-data-aisg-processed train_model.setup_mlflow=true train_model.mlflow_tracking_uri=<MLFLOW_TRACKING_URI> train_model.mlflow_exp_name=<NAME_OF_DEFAULT_MLFLOW_EXPERIMENT> train_model.model_checkpoint_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}}/models train_model.epochs=3'"
+        --command -- "/bin/bash -c 'source activate {{cookiecutter.repo_name}} && python src/train_model.py train_model.data_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/data/processed/mnist-pngs-data-aisg-processed train_model.setup_mlflow=true train_model.mlflow_tracking_uri=<MLFLOW_TRACKING_URI> train_model.mlflow_exp_name=<NAME_OF_MLFLOW_EXPERIMENT> train_model.model_checkpoint_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}}/models train_model.epochs=3'"
     ```
 
 Once you have successfully run an experiment, you may inspect the run
 on the MLflow Tracking server. Through the MLflow Tracking server
 interface, you can view the metrics and parameters logged for the run,
-as well as download the artifacts that have been uploaded to the ECS
+as well as download the artifacts that have been uploaded to the GCS
 bucket. You can also compare runs with each other.
 
 ![MLflow Tracking Server - Inspecting Runs](https://storage.googleapis.com/aisg-mlops-pub-data/images/mlflow-tracking-server-inspect.gif)
@@ -333,18 +323,15 @@ by default.
     ```bash
     $ runai submit \
         --job-name-prefix <YOUR_HYPHENATED_NAME>-train \
-        -i {{cookiecutter.harbor_registry_project_path}}/model-training:0.1.0 \
+        -i {{cookiecutter.image_registry_path}}/model-training:0.1.0 \
         --working-dir /home/aisg/{{cookiecutter.repo_name}} \
         --pvc <NAME_OF_DATA_SOURCE>:/<NAME_OF_DATA_SOURCE> \
         --cpu 2 \
         --memory 4G \
-        -e AWS_ACCESS_KEY_ID=SECRET:s3-credentials,accessKeyId \
-        -e AWS_SECRET_ACCESS_KEY=SECRET:s3-credentials,secretAccessKey \
-        -e MLFLOW_S3_ENDPOINT_URL="https://necs.nus.edu.sg" \
         -e MLFLOW_TRACKING_USERNAME=<YOUR_MLFLOW_USERNAME> \
         -e MLFLOW_TRACKING_PASSWORD=<YOUR_MLFLOW_PASSWORD> \
         -e MLFLOW_HPTUNING_TAG=$(date +%s) \
-        --command -- '/bin/bash -c "source activate {{cookiecutter.repo_name}} && python src/train_model.py --multirun train_model.data_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/data/processed/mnist-pngs-data-aisg-processed train_model.setup_mlflow=true train_model.mlflow_tracking_uri=<MLFLOW_TRACKING_URI> train_model.mlflow_exp_name=<NAME_OF_DEFAULT_MLFLOW_EXPERIMENT> train_model.model_checkpoint_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}}/models train_model.epochs=3"'
+        --command -- '/bin/bash -c "source activate {{cookiecutter.repo_name}} && python src/train_model.py --multirun train_model.data_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/data/processed/mnist-pngs-data-aisg-processed train_model.setup_mlflow=true train_model.mlflow_tracking_uri=<MLFLOW_TRACKING_URI> train_model.mlflow_exp_name=<NAME_OF_MLFLOW_EXPERIMENT> train_model.model_checkpoint_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}}/models train_model.epochs=3"'
     ```
 
 === "Windows PowerShell"
@@ -352,18 +339,15 @@ by default.
     ```powershell
     $ runai submit `
         --job-name-prefix <YOUR_HYPHENATED_NAME>-train `
-        -i {{cookiecutter.harbor_registry_project_path}}/model-training:0.1.0 `
+        -i {{cookiecutter.image_registry_path}}/model-training:0.1.0 `
         --working-dir /home/aisg/{{cookiecutter.repo_name}} `
         --pvc <NAME_OF_DATA_SOURCE>:/<NAME_OF_DATA_SOURCE> `
         --cpu 2 `
         --memory 4G `
-        -e AWS_ACCESS_KEY_ID=SECRET:s3-credentials,accessKeyId `
-        -e AWS_SECRET_ACCESS_KEY=SECRET:s3-credentials,secretAccessKey `
-        -e MLFLOW_S3_ENDPOINT_URL="https://necs.nus.edu.sg" `
         -e MLFLOW_TRACKING_USERNAME=<YOUR_MLFLOW_USERNAME> `
         -e MLFLOW_TRACKING_PASSWORD=<YOUR_MLFLOW_PASSWORD> `
         -e MLFLOW_HPTUNING_TAG=$(Get-Date -UFormat %s -Millisecond 0) `
-        --command -- "/bin/bash -c 'source activate {{cookiecutter.repo_name}} && python src/train_model.py --multirun train_model.data_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/data/processed/mnist-pngs-data-aisg-processed train_model.setup_mlflow=true train_model.mlflow_tracking_uri=<MLFLOW_TRACKING_URI> train_model.mlflow_exp_name=<NAME_OF_DEFAULT_MLFLOW_EXPERIMENT> train_model.model_checkpoint_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}}/models train_model.epochs=3'"
+        --command -- "/bin/bash -c 'source activate {{cookiecutter.repo_name}} && python src/train_model.py --multirun train_model.data_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/data/processed/mnist-pngs-data-aisg-processed train_model.setup_mlflow=true train_model.mlflow_tracking_uri=<MLFLOW_TRACKING_URI> train_model.mlflow_exp_name=<NAME_OF_MLFLOW_EXPERIMENT> train_model.model_checkpoint_dir_path=/<NAME_OF_DATA_SOURCE>/workspaces/<YOUR_HYPHENATED_NAME>/{{cookiecutter.repo_name}}/models train_model.epochs=3'"
     ```
 
 ![MLflow Tracking Server - Hyperparameter Tuning Runs](assets/screenshots/mlflow-tracking-hptuning-runs.png)
