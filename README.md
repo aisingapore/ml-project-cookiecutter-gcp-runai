@@ -1,10 +1,10 @@
-# AI Singapore's Cookiecutter Template for End-to-end ML Projects (On-prem | Run:ai)
+# AI Singapore's Cookiecutter Template for End-to-end ML Projects (GCP | Run:ai)
 
 ![AI Singapore's Kapitan Hull EPTG GCP Run:ai Banner](./assets/kapitan-hull-eptg-gcp-runai-banner.png)
 
 ## Table of Contents
 
-- [AI Singapore's Cookiecutter Template for End-to-end ML Projects (On-prem | Run:ai)](#ai-singapores-cookiecutter-template-for-end-to-end-ml-projects-on-prem--runai)
+- [AI Singapore's Cookiecutter Template for End-to-end ML Projects (GCP | Run:ai)](#ai-singapores-cookiecutter-template-for-end-to-end-ml-projects-gcp--runai)
   - [Table of Contents](#table-of-contents)
   - [Preface](#preface)
   - [Usage](#usage)
