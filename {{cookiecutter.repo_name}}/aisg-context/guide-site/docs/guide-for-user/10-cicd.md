@@ -53,63 +53,14 @@ pipeline.
 Before we can make use of the GitLab CI pipeline, we would have to
 define the following variable(s) for the pipeline beforehand:
 
-- `HARBOR_ROBOT_CREDS_JSON`: A JSON formatted value that contains
-  encoded credentials for a robot account on Harbor. This is to allow
-  the pipeline to interact with the Harbor server. See
-  [here](#docker-configuration-file-for-accessing-harbor) on how to
-  generate this value/file.
+- `GCP_SERVICE_ACCOUNT_KEY`: A service account's
+  JSON key that is to be used for communicating with GCP services.
 
 To define CI/CD variables for a project (repository), follow the steps
 listed
 [here](https://docs.gitlab.com/ee/ci/variables/#add-a-cicd-variable-to-a-project).
-The environment variable `HARBOR_ROBOT_CREDS_JSON` needs to be a `File`
+The environment variable `GCP_SERVICE_ACCOUNT_KEY` needs to be a `File`
 type.
-
-### Docker Configuration File for Accessing Harbor
-
-The variable `HARBOR_ROBOT_CREDS_JSON` will be used to populate the
-files `/kaniko/.docker/config.json` and `/root/.docker/config.json` for
-`kaniko` and `crane` to authenticate themselves before communicating
-with AI Singapore's Harbor registry. You may create the JSON file like
-so:
-
-=== "Linux/macOS"
-
-    ```bash
-    $ echo -n <HARBOR_USERNAME>:<HARBOR_PASSWORD> | base64
-    <ENCODED_OUTPUT_HERE>
-    ```
-
-=== "Windows PowerShell"
-
-    ```powershell
-    $ $cred = "<HARBOR_USERNAME>:<HARBOR_PASSWORD>"
-    $ $bytes = [System.Text.Encoding]::ASCII.GetBytes($cred)
-    $ $base64 = [Convert]::ToBase64String($bytes)
-    $ echo $base64
-    <ENCODED_OUTPUT_HERE>
-    ```
-
-Using the output from above, copy and paste the following content
-into a CI/CD environment variable of type `File`
-(under `Settings` -> `CI/CD` -> `Variables` -> `Add variable`):
-
-```json
-{
-        "auths": {
-                "registry.aisingapore.net": {
-                        "auth": "<ENCODED_OUTPUT_HERE>"
-                }
-        }
-}
-```
-
-![GitLab UI - Set File Variable under CI/CD Settings](assets/screenshots/gitlab-settings-cicd-set-file-var.png)
-
-__Reference(s):__
-
-- [GitLab Docs - GitLab CI/CD variables](https://docs.gitlab.com/ee/ci/variables/)
-- [Docker Docs - Configuration files](https://docs.docker.com/engine/reference/commandline/cli/#configuration-files)
 
 ## Stages & Jobs
 
@@ -225,8 +176,8 @@ __Reference(s):__
 The template has thus far introduced a couple of Docker images relevant
 for the team. The tags for all the Docker images are listed below:
 
-- `{{cookiecutter.harbor_registry_project_path}}/data-prep`
-- `{{cookiecutter.harbor_registry_project_path}}/model-training`
+- `{{cookiecutter.image_registry_path}}/data-prep`
+- `{{cookiecutter.image_registry_path}}/model-training`
 
 The `build` stage aims at automating the building of these Docker
 images in a parallel manner. Let's look at a snippet for a single job
@@ -241,14 +192,16 @@ that builds a Docker image:
       image:
         name: gcr.io/kaniko-project/executor:debug
         entrypoint: [""]
+      variables:
+        GOOGLE_APPLICATION_CREDENTIALS: /kaniko/gcp-sa.json
       script:
         - mkdir -p /kaniko/.docker
-        - cat $HARBOR_ROBOT_CREDS_JSON > /kaniko/.docker/config.json
+        - cat $GCP_SERVICE_ACCOUNT_KEY > /kaniko/.docker/config.json
         - >-
           /kaniko/executor
           --context "${CI_PROJECT_DIR}"
           --dockerfile "${CI_PROJECT_DIR}/docker/{{cookiecutter.repo_name}}-data-prep.Dockerfile"
-          --destination "{{cookiecutter.harbor_registry_project_path}}/data-prep:${CI_COMMIT_SHORT_SHA}"
+          --destination "{{cookiecutter.image_registry_path}}/data-prep:${CI_COMMIT_SHORT_SHA}"
       rules:
         - if: $CI_MERGE_REQUEST_IID
           changes:
@@ -308,9 +261,9 @@ Hence, for the job defined below, it would only trigger if a tag
 is pushed to the default branch and only the default branch.
 The tag pushed (say through a command like `git push <remote> <tag>`)
 to the default branch on the remote would have the runner
-__retag__ the Docker image that exists on Harbor with the tag that is
-being pushed. The relevant images to be retagged are originally tagged
-with the short commit hash obtained from the commit that was pushed
+__retag__ the Docker image that exists on GCR with the tag that is being
+pushed. The relevant images to be retagged are originally tagged with
+the short commit hash obtained from the commit that was pushed
 to the default branch before this.
 
 === "`.gitlab-ci.yml`"
@@ -320,13 +273,14 @@ to the default branch before this.
     build:retag-images:
       stage: build
       image:
-        name: gcr.io/go-containerregistry/crane:debug
-        entrypoint: [""]
+        name: google/cloud-sdk:debian_component_based
+      variables:
+        GOOGLE_APPLICATION_CREDENTIALS: /gcp-sa.json
       script:
-        - cat $HARBOR_ROBOT_CREDS_JSON > /root/.docker/config.json
-        - crane auth login registry.aisingapore.net
-        - crane tag {{cookiecutter.harbor_registry_project_path}}/data-prep:${CI_COMMIT_SHORT_SHA} ${$CI_COMMIT_TAG}
-        - crane tag {{cookiecutter.harbor_registry_project_path}}/model-training:${CI_COMMIT_SHORT_SHA} ${$CI_COMMIT_TAG}
+        - cat $GCP_SERVICE_ACCOUNT_KEY > /gcp-sa.json
+        - gcloud auth activate-service-account --key-file=/gcp-sa.json
+        - gcloud container images add-tag --quiet "{{cookiecutter.image_registry_path}}/data-prep:${CI_COMMIT_TAG}"
+        - gcloud container images add-tag --quiet "{{cookiecutter.image_registry_path}}/model-training:${CI_COMMIT_TAG}"
       rules:
         - if: $CI_COMMIT_TAG && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     ...
