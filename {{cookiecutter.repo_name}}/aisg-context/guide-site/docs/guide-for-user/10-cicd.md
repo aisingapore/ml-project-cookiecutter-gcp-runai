@@ -103,7 +103,6 @@ services can be accessed within our pipelines.
     default:
       tags:
         - dind
-        - on-prem
     ...
     ```
 
