@@ -1,6 +1,6 @@
 # AI Singapore's Cookiecutter Template for End-to-end ML Projects (On-prem | Run:ai)
 
-![AI Singapore's Kapitan Hull EPTG Onprem Run:ai Banner](./assets/kapitan-hull-eptg-onprem-runai-banner.png)
+![AI Singapore's Kapitan Hull EPTG GCP Run:ai Banner](./assets/kapitan-hull-eptg-gcp-runai-banner.png)
 
 ## Table of Contents
 

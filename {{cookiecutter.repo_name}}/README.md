@@ -1,6 +1,6 @@
 # End-to-end Project Template (On-prem | Run:ai)
 
-![AI Singapore's Kapitan Hull EPTG Onprem Run:ai Banner](./aisg-context/guide-site/docs/assets/images/kapitan-hull-eptg-onprem-runai-banner.png)
+![AI Singapore's Kapitan Hull EPTG Onprem Run:ai Banner](./aisg-context/guide-site/docs/assets/images/kapitan-hull-eptg-gcp-runai-banner.png)
 
 __Customised for `{{cookiecutter.project_name}}`__.
 
