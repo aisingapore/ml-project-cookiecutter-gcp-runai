@@ -12,7 +12,7 @@ following
 [`cookiecutter`](https://cookiecutter.readthedocs.io/en/stable/)
 template:
 
-> https://github.com/aisingapore/ml-project-cookiecutter-onprem-runai
+> https://github.com/aisingapore/ml-project-cookiecutter-gcp-runai
 
 This `mkdocs` site is for serving the contents of the end-to-end
 guide in a more readable manner, as opposed to plain
@@ -20,7 +20,7 @@ Markdown views. The contents of this guide have been customised
 according to the inputs provided upon generation of this repository
 through the usage of the `cookiecutter` CLI,
 following instructions detailed
-[here](https://github.com/aisingapore/ml-project-cookiecutter-onprem-runai/blob/main/README.md)
+[here](https://github.com/aisingapore/ml-project-cookiecutter-gcp-runai/blob/main/README.md)
 .
 
 Inputs provided to `cookiecutter` for the generation of this

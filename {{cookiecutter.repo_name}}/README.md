@@ -1,6 +1,6 @@
-# End-to-end Project Template (On-prem | Run:ai)
+# End-to-end Project Template (GCP | Run:ai)
 
-![AI Singapore's Kapitan Hull EPTG Onprem Run:ai Banner](./aisg-context/guide-site/docs/assets/images/kapitan-hull-eptg-gcp-runai-banner.png)
+![AI Singapore's Kapitan Hull EPTG GCP Run:ai Banner](./aisg-context/guide-site/docs/kapitan-hull-eptg-gcp-runai-banner.png)
 
 __Customised for `{{cookiecutter.project_name}}`__.
 
@@ -11,13 +11,13 @@ generated and customised using the
 following
 [`cookiecutter`](https://cookiecutter.readthedocs.io/en/stable/)
 template:
-https://github.com/aisingapore/ml-project-cookiecutter-onprem-runai
+https://github.com/aisingapore/ml-project-cookiecutter-gcp-runai
 
 The contents of the guide have been customised
 according to the inputs provided upon generation of this repository
 through the usage of `cookiecutter` CLI,
 following instructions detailed
-[here](https://github.com/aisingapore/ml-project-cookiecutter-onprem-runai/blob/main/README.md)
+[here](https://github.com/aisingapore/ml-project-cookiecutter-gcp-runai/blob/main/README.md)
 .
 
 Inputs provided to `cookiecutter` for the generation of this
@@ -46,7 +46,7 @@ the contents are optimised for viewing through
 specifically)
 .
 A demo of the site for the guide can be viewed
-[here](https://aisingapore.github.io/ml-project-cookiecutter-onprem-runai)
+[here](https://aisingapore.github.io/ml-project-cookiecutter-gcp-runai)
 .
 
 To spin up the site on your local machine, you can create a virtual
