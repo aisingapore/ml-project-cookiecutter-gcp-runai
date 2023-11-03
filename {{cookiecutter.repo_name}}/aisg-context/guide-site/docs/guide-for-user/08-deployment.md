@@ -21,52 +21,31 @@ __Reference(s):__
 Seen in
 ["Model Training"](./07-job-orchestration.md#model-training)
 , we have the trained models
-uploaded to ECS through the MLflow Tracking server (done through
-autolog). With that, we have the following pointers to take note of:
+uploaded to GCS through the MLflow Tracking server. With that, we have
+the following pointers to take note of:
 
 - By default, each MLflow experiment run is given a unique ID.
-- When artifacts are uploaded to ECS through MLflow,
-  the artifacts are located within directories named after the
-  unique IDs of the runs.
+- When artifacts are uploaded to GCS through MLflow,
+  the artifacts are located within subdirectories that follows the
+  experiment IDs and the unique IDs of each run.
 - Artifacts for specific runs will be uploaded to a directory with a
   convention similar to the following:
-  `<MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/<MLFLOW_RUN_UUID>/artifacts`.
-- With this path/URI, we can use the AWS CLI to download the predictive
-  model from ECS into a mounted volume when we run the Docker image for
+  `<DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/<MLFLOW_RUN_UUID>/artifacts`.
+- `DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH` is the default path/URI to the
+  GCS bucket that is used by MLflow to upload artifacts to. This path is
+  provided to each team upon receipt of the MLflow Tracking server
+  credentials and information.
+- With these paths/URI, we can use the `gcloud` CLI to download the predictive
+  model from GCS into a mounted volume when we run the Docker image for
   the REST APIs.
 
-Here's how you can quickly retrieve the artifact location of a
-specific MLflow experiment within your VSCode server:
+To list the contents of the artifact location, you can use the `gsutil`
+CLI (installed within AISG's VSCode servers by default) like so:
 
 === "Linux/macOS"
 
     ```bash
-    $ export MLFLOW_TRACKING_URI=<MLFLOW_TRACKING_URI>
-    $ export MLFLOW_TRACKING_USERNAME=<MLFLOW_TRACKING_USERNAME>
-    $ export MLFLOW_TRACKING_PASSWORD=<MLFLOW_TRACKING_PASSWORD>
-    $  python -c "import mlflow; mlflow_experiment = mlflow.get_experiment_by_name('<NAME_OF_MLFLOW_EXPERIMENT>'); print(mlflow_experiment.artifact_location)"
-    s3://<BUCKET_NAME>/subdir/paths
-    ```
-
-=== "Windows PowerShell"
-
-    ```powershell
-    $ $Env:MLFLOW_TRACKING_URI=<MLFLOW_TRACKING_URI>
-    $ $Env:MLFLOW_TRACKING_USERNAME=<MLFLOW_TRACKING_USERNAME>
-    $ $Env:MLFLOW_TRACKING_PASSWORD=<MLFLOW_TRACKING_PASSWORD>
-    $  python -c "import mlflow; mlflow_experiment = mlflow.get_experiment_by_name('<NAME_OF_MLFLOW_EXPERIMENT>'); print(mlflow_experiment.artifact_location)"
-    s3://<BUCKET_NAME>/subdir/paths
-    ```
-
-To list the contents of the artifact location, you can use the AWS CLI
-(installed within the VSCOde server by default) like so:
-
-=== "Linux/macOS"
-
-    ```bash
-    $ export AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
-    $ export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
-    $ aws s3 ls --endpoint-url "https://necs.nus.edu.sg" <MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/
+    $ gsutil ls <DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/
                            PRE XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/
                            PRE YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/
                            PRE ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/
@@ -75,9 +54,7 @@ To list the contents of the artifact location, you can use the AWS CLI
 === "Windows PowerShell"
 
     ```powershell
-    $ $Env:AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
-    $ $Env:AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
-    $ aws s3 ls --endpoint-url "https://necs.nus.edu.sg" <MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/
+    $ gsutil ls <DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/
                            PRE XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/
                            PRE YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/
                            PRE ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ/
@@ -85,23 +62,23 @@ To list the contents of the artifact location, you can use the AWS CLI
 
 What would be listed are subdirectories named after MLflow experiment
 unique IDs. Within each of these subdirectories, we will find the
-artifacts uploaded to ECS.To list the artifacts of a specific run,
+artifacts uploaded to GCS.To list the artifacts of a specific run,
 we can run a command like the following:
 
 === "Linux/macOS"
 
     ```bash
-    $ aws s3 ls --recursive --endpoint-url "https://necs.nus.edu.sg" <MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/<MLFLOW_RUN_UUID>
-    YYYY-MM-DD hh:mm:ss   XXXXXXXX <MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/<MLFLOW_RUN_UUID>/artifacts/model/model.pt
-    YYYY-MM-DD hh:mm:ss   XXXXXXXX <MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/<MLFLOW_RUN_UUID>/artifacts/train_model_config.json
+    $ gsutil ls -r <DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/<MLFLOW_RUN_UUID>
+    YYYY-MM-DD hh:mm:ss   XXXXXXXX <DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/<MLFLOW_RUN_UUID>/artifacts/model/model.pt
+    YYYY-MM-DD hh:mm:ss   XXXXXXXX <DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/<MLFLOW_RUN_UUID>/artifacts/train_model_config.json
     ```
 
 === "Windows PowerShell"
 
     ```powershell
-    $ aws s3 ls --recursive --endpoint-url "https://necs.nus.edu.sg" <MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/<MLFLOW_RUN_UUID>
-    YYYY-MM-DD hh:mm:ss   XXXXXXXX <MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/<MLFLOW_RUN_UUID>/artifacts/model/model.pt
-    YYYY-MM-DD hh:mm:ss   XXXXXXXX <MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/<MLFLOW_RUN_UUID>/artifacts/train_model_config.json
+    $ gsutil ls -r <DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/<MLFLOW_RUN_UUID>
+    YYYY-MM-DD hh:mm:ss   XXXXXXXX <DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/<MLFLOW_RUN_UUID>/artifacts/model/model.pt
+    YYYY-MM-DD hh:mm:ss   XXXXXXXX <DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/<MLFLOW_RUN_UUID>/artifacts/train_model_config.json
     ```
 
 Now that we have established on how we are to obtain the models for the
@@ -150,16 +127,16 @@ following commands:
 
     ```bash
     $ export PRED_MODEL_UUID=<MLFLOW_RUN_UUID>
-    $ export PRED_MODEL_ECS_S3_URI=<MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/$PRED_MODEL_UUID
-    $ aws s3 cp --recursive --endpoint-url "https://necs.nus.edu.sg" $PRED_MODEL_ECS_S3_URI ./models/$PRED_MODEL_UUID
+    $ export PRED_MODEL_GCS_URI=<DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/$PRED_MODEL_UUID
+    $ gsutil cp -r $PRED_MODEL_GCS_URI ./models/$PRED_MODEL_UUID
     ```
 
 === "Windows PowerShell"
 
     ```powershell
     $ $Env:PRED_MODEL_UUID=<MLFLOW_RUN_UUID>
-    $ $Env:PRED_MODEL_ECS_S3_URI=<MLFLOW_EXPERIMENT_ARTIFACT_LOCATION>/$Env:MLFLOW_RUN_UUID
-    $ aws s3 cp --recursive --endpoint-url "https://necs.nus.edu.sg" $Env:PRED_MODEL_ECS_S3_URI .\models\$Env:PRED_MODEL_UUID
+    $ $Env:PRED_MODEL_GCS_URI=<DEFAULT_MLFLOW_ARTEFACTS_GCS_PATH>/<MLFLOW_EXPERIMENT_ID>/$Env:MLFLOW_RUN_UUID
+    $ gsutil cp -r $Env:PRED_MODEL_GCS_URI .\models\$Env:PRED_MODEL_UUID
     ```
 
 Executing the commands above will download the artifacts related to the
