@@ -11,7 +11,7 @@ spec:
   name: 
     value: {{cookiecutter.author_name.replace('_', '-')}}-data-prep
   image:
-    value: {{cookiecutter.harbor_registry_project_path}}/data-prep:0.1.0
+    value: {{cookiecutter.image_registry_path}}/data-prep:0.1.0
   imagePullPolicy:
     value: Always
   command:

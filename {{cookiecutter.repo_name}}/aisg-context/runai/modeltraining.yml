@@ -25,7 +25,7 @@ spec:
   name:
     value: {{cookiecutter.author_name.replace('_', '-')}}-train
   image: 
-    value: {{cookiecutter.harbor_registry_project_path}}/model-training:0.1.0
+    value: {{cookiecutter.image_registry_path}}/model-training:0.1.0
   imagePullPolicy:
     value: Always
   command:
